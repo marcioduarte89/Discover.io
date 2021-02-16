@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Protos\DiscoveryService.proto" />
+    <None Remove="Protos\MonitorService.proto" />
+    <None Remove="Protos\RegistrationService.proto" />
+    <None Remove="Protos\UUID.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Api.CommonProtos" Version="2.2.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.35.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.35.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\DiscoveryService.proto" GrpcServices="Server">
+      <ProtoRoot>Protos\</ProtoRoot>
+    </Protobuf>
+    <Protobuf Include="Protos\MonitorService.proto" GrpcServices="Server">
+      <ProtoRoot>Protos\</ProtoRoot>
+    </Protobuf>
+    <Protobuf Include="Protos\RegistrationService.proto" GrpcServices="Server">
+      <ProtoRoot>Protos\</ProtoRoot>
+    </Protobuf>
+    <Protobuf Include="Protos\UUID.proto" GrpcServices="None">
+      <ProtoRoot>Protos\</ProtoRoot>
+    </Protobuf>
+  </ItemGroup>
+
+</Project>

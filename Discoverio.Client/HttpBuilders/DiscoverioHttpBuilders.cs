@@ -1,18 +1,17 @@
 ﻿using Discoverio.Client.Delegates;
-using Discoverio.Client.Exceptions;
+using Discoverio.Client.Middlewares;
+using Discoverio.Client.Policies;
 using Discoverio.Client.Services.Host;
 using Discoverio.Client.Services.Initializer;
+using Discoverio.Client.Services.Monitor;
 using Discoverio.Client.Services.Registration;
-using DiscoveryService.Services;
-using Grpc.Core;
-using Grpc.Net.Client;
 using Grpc.Net.ClientFactory;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Polly;
 using System;
-using System.Net;
 using System.Net.Http;
 using static DiscoveryService.Services.ApplicationRegistrationService;
 using static DiscoveryService.Services.DiscoveryService;
@@ -22,40 +21,33 @@ namespace Discoverio.Client.HttpBuilders
 {
     public static class DiscoverioHttpBuilders
     {
-        private static IRegistrationService _registrationService;
-
-        private static Func<HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>> retryFunc = (request) =>
-        {
-            return Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.OK && StatusManager.GetStatusCode(r) == StatusCode.NotFound)
-            .RetryAsync(1, async (result, retryCount, context) =>
-            {
-                await _registrationService.Register();
-            });
-        };
-
         public static void AddDiscoverio(this IServiceCollection services)
         {
-            var serverDeclaration = new Action<IServiceProvider, GrpcClientFactoryOptions>((s, o) =>
+            var grpcServerDeclaration = new Action<IServiceProvider, GrpcClientFactoryOptions>((s, o) =>
             {
                 var serverHost = s.GetService<IConfiguration>().GetValue<string>("Discoverio.Client:ServerHost");
                 o.Address = new Uri(serverHost);
             });
 
-            services.AddGrpcClient<ApplicationRegistrationServiceClient>(serverDeclaration).AddPolicyHandler(retryFunc);
+            var policySelector = new Func<IServiceProvider, HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>>((sp, httpResponseMessage) =>
+            {
+                var errorPolicy = sp.GetService<IErrorPolicy>();
+                return errorPolicy.RegistrationRetryPolicy(httpResponseMessage);
+            });
 
-            services.AddGrpcClient<DiscoveryServiceClient>(serverDeclaration).AddPolicyHandler(retryFunc);
-
-            services.AddGrpcClient<MonitorServiceClient>(serverDeclaration);
+            services.AddGrpcClient<ApplicationRegistrationServiceClient>(grpcServerDeclaration);
+            services.AddGrpcClient<DiscoveryServiceClient>(grpcServerDeclaration).AddPolicyHandler(policySelector).AddInterceptor<LoggerInterceptor>();
+            services.AddGrpcClient<MonitorServiceClient>(grpcServerDeclaration).AddInterceptor<LoggerInterceptor>();
 
             services.AddHttpContextAccessor();
-            services.AddScoped<IInitializerService, DiscoverioInitializerService>();
+            //services.AddSingleton<IInitializerService, DiscoverioInitializerService>();
             services.AddSingleton<IRegistrationService, RegistrationService>();
+            services.AddSingleton<IMonitorService, MonitorService>();
             services.AddSingleton<IMemoryCache, MemoryCache>();
             services.AddScoped<IHostService, HostService>();
+            services.AddScoped<IErrorPolicy, ErrorPolicy>();
             services.AddScoped<ServiceDiscoveryHandler>();
-
-            var serviceProvider = services.BuildServiceProvider();
-            _registrationService = serviceProvider.GetService<IRegistrationService>();
+            services.AddSingleton<LoggerInterceptor>();
         }
 
         public static void AddDiscovery(this IHttpClientBuilder builder)

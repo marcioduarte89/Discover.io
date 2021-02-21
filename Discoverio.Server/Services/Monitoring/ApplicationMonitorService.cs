@@ -17,10 +17,10 @@ namespace Discoverio.Server.Services.Monitoring
 
         public override Task<DiscoveryService.Services.Status> HeartBeat(UUID request, ServerCallContext context)
         {
-            _registrationProvider.RegisterHeartBeat(request);
+            var result = _registrationProvider.RegisterHeartBeat(request);
             return Task.FromResult(new DiscoveryService.Services.Status()
             {
-                Success = true
+                Success = result
             });
         }
     }

@@ -38,8 +38,6 @@ namespace ClientAppOne
 
             app.UseRouting();
 
-            app.UseDiscoverio();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => {

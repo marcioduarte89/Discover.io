@@ -23,9 +23,9 @@ namespace Discoverio.Server.Services.RegistrationProviders
             LastUpdated = DateTime.Now;
         }
 
-        public bool HasExpired()
+        public bool HasExpired(double allowedTimeElapsed)
         {
-            return (DateTime.Now - LastUpdated).TotalSeconds > 15;
+            return (DateTime.Now - LastUpdated).TotalSeconds > allowedTimeElapsed;
         }
     }
 }

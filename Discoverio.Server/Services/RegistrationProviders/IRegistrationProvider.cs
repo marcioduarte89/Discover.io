@@ -13,7 +13,7 @@ namespace Discoverio.Server.Services.RegistrationProviders
 
         bool HasRegistration(UUID uniqueId);
 
-        void RegisterHeartBeat(UUID uniqueId);
+        bool RegisterHeartBeat(UUID uniqueId);
 
         event EventHandler<RegistrationCreatedEventArgs> RegistrationCreated;
 

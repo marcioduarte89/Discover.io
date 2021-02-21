@@ -53,5 +53,10 @@ namespace Discoverio.Server.Services.LoadBalancing.RoundRobin
 
             return Hosts[CurrentIndex++];
         }
+
+        public bool HasHosts()
+        {
+            return Hosts.Count > 0;
+        }
     }
 }

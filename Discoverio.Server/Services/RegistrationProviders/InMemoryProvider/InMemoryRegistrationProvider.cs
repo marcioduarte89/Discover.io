@@ -1,6 +1,8 @@
 ﻿using Discoverio.Server.Services.RegistrationProviders.Events;
 using DiscoveryService.Services;
 using Grpc.Core;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,16 +14,21 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
     public class InMemoryRegistrationProvider : IRegistrationProvider
     {
         private ConcurrentDictionary<Guid, Registration> _registrations;
+        private readonly ILogger<InMemoryRegistrationProvider> _logger;
+        private readonly IConfiguration _configuration;
+        private Timer _timer;
 
         public event EventHandler<RegistrationCreatedEventArgs> RegistrationCreated;
         public event EventHandler<RegistrationExpiredEventArgs> RegistrationExpired;
 
         public IEnumerable<Registration> Registrations => _registrations.Values;
 
-        public InMemoryRegistrationProvider()
+        public InMemoryRegistrationProvider(ILogger<InMemoryRegistrationProvider> logger, IConfiguration configuration)
         {
             _registrations = new ConcurrentDictionary<Guid, Registration>();
-            new Timer(UnRegister, null, 0, 15); //make this configurable
+            _timer = new Timer(UnRegister, null, TimeSpan.Zero, TimeSpan.FromSeconds(configuration.GetValue<double>("Discoverio.Server:DeRegisterCycleFrequency")));
+            _logger = logger;
+            _configuration = configuration;
         }
 
         public UUID Register(string appName, string host)
@@ -41,9 +48,12 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
                 throw new RpcException(new Grpc.Core.Status(StatusCode.InvalidArgument, $"Host { host } is not a valid host"));
             }
 
-            if (_registrations.Values.Any(x => x.AppName.Equals(appName, StringComparison.OrdinalIgnoreCase) && x.Host.Equals(host, StringComparison.OrdinalIgnoreCase)))
+            var existingRegistration = _registrations.Values.FirstOrDefault(x => x.AppName.Equals(appName, StringComparison.OrdinalIgnoreCase) && x.Host.Equals(host, StringComparison.OrdinalIgnoreCase));
+
+            if (existingRegistration != null)
             {
-                throw new RpcException(new Grpc.Core.Status(StatusCode.AlreadyExists, $"Application name { appName } with host { host } already registered"));
+                return existingRegistration.UniqueIdentifier;
+                //throw new RpcException(new Grpc.Core.Status(StatusCode.AlreadyExists, $"Application name { appName } with host { host } already registered"));
             }
 
             var uniqueIdGuid = Guid.NewGuid();
@@ -58,21 +68,29 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
 
             RegistrationCreated?.Invoke(this, registration);
 
+            _logger.LogInformation($"Registered application with appName {appName} and host {host}");
+
             return uniqueId;
         }
 
-        public void RegisterHeartBeat(UUID uniqueId)
+        public bool RegisterHeartBeat(UUID uniqueId)
         {
             if (!_registrations.TryGetValue(new Guid(uniqueId.Value), out var registration))
             {
-                throw new RpcException(new Grpc.Core.Status(StatusCode.NotFound, $"Application with unique id { uniqueId.Value } does not exist"));
+                return false;
+                //throw new RpcException(new Grpc.Core.Status(StatusCode.NotFound, $"Application with unique id { uniqueId.Value } does not exist"));
             }
 
             registration.RegisterHeartBeat();
+
+            _logger.LogInformation($"Registering heartbeat for application with appName { registration.AppName } and host { registration.Host }");
+            return true;
         }
 
         private void UnRegister(object state)
         {
+            _logger.LogInformation($"Starting UnRegistering check cycle");
+
             if (!_registrations.Any())
             {
                 return;
@@ -80,10 +98,11 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
 
             foreach (var reg in _registrations)
             {
-                if (reg.Value.HasExpired())
+                if (reg.Value.HasExpired(_configuration.GetValue<double>("Discoverio.Server:ElapsedTimeToDeRegister")))
                 {
                     if(_registrations.TryRemove(reg.Key, out var registration))
                     {
+                        _logger.LogInformation($"UnRegistering application with appName { registration.AppName } and host { registration.Host }");
                         RegistrationExpired?.Invoke(this, new RegistrationExpiredEventArgs() { Registration = registration });
                     }
                 }
@@ -92,6 +111,11 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
 
         public bool HasRegistration(UUID uniqueId)
         {
+            if(uniqueId == null)
+            {
+                return false;
+            }
+
             return _registrations.TryGetValue(new Guid(uniqueId.Value), out var _);
         }
     }

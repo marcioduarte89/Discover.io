@@ -1,3 +1,4 @@
+using Discoverio.Client.HostBuilder.Extensions;
 using Discoverio.Client.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ namespace ClientAppTwo
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .AddDiscoveryHostedService();
     }
 }

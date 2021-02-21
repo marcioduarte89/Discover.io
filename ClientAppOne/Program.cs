@@ -1,6 +1,5 @@
-using Discoverio.Client.Services;
+using Discoverio.Client.HostBuilder.Extensions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IHostBuilder = Microsoft.Extensions.Hosting.IHostBuilder;
 
@@ -18,6 +17,7 @@ namespace ClientAppOne
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .AddDiscoveryHostedService();
     }
 }

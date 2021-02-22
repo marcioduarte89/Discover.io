@@ -64,7 +64,7 @@ namespace Discoverio.Client.Services
                 {
                     _hasSuccessfulHeartBeat = await _monitorService.SendHeartBeat(registrationStatus.UniqueIdentifier);
 
-                    // If the hearbeat failed its because the server recycled the registration pool and the app was not found, so try and register again
+                    // If the hearbeat failed its because the server recycled the particular app from the registration pool and the app was not found, so initiate the registration cycle
                     if (!_hasSuccessfulHeartBeat)
                     {
                         _hasSuccessfulRegistration = false;

@@ -5,6 +5,7 @@ namespace Discoverio.Server.Services.LoadBalancing.RoundRobin
 {
     internal class HostDistributor
     {
+        private readonly object _indexLock = new object();
         private int CurrentIndex { get; set; }
         private List<string> Hosts { get; set; }
 
@@ -16,14 +17,14 @@ namespace Discoverio.Server.Services.LoadBalancing.RoundRobin
 
         public void AddHost(string host)
         {
-            if (string.IsNullOrEmpty(host))
+            if (string.IsNullOrWhiteSpace(host))
             {
-                throw new RpcException(new Grpc.Core.Status(StatusCode.InvalidArgument, $"Host cannot be null or empty"));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, $"Host cannot be null or empty"));
             }
 
             if (Hosts.Contains(host))
             {
-                throw new RpcException(new Grpc.Core.Status(StatusCode.AlreadyExists, $"Host {host} already exists"));
+                throw new RpcException(new Status(StatusCode.AlreadyExists, $"Host {host} already exists"));
             }
 
             Hosts.Add(host);
@@ -31,9 +32,14 @@ namespace Discoverio.Server.Services.LoadBalancing.RoundRobin
 
         public void RemoveHost(string host)
         {
-            if (string.IsNullOrEmpty(host))
+            if (string.IsNullOrWhiteSpace(host))
             {
-                throw new RpcException(new Grpc.Core.Status(StatusCode.AlreadyExists, $"Host cannot be null or empty"));
+                throw new RpcException(new Status(StatusCode.AlreadyExists, $"Host cannot be null or empty"));
+            }
+
+            if (!HasHost(host))
+            {
+                throw new RpcException(new Status(StatusCode.AlreadyExists, $"Host {host} does not exist"));
             }
 
             Hosts.Remove(host);
@@ -46,12 +52,15 @@ namespace Discoverio.Server.Services.LoadBalancing.RoundRobin
 
         public string NextHost()
         {
-            if (CurrentIndex == Hosts.Count)
+            lock (_indexLock)
             {
-                CurrentIndex = 0;
-            }
+                if (CurrentIndex == Hosts.Count)
+                {
+                    CurrentIndex = 0;
+                }
 
-            return Hosts[CurrentIndex++];
+                return Hosts[CurrentIndex++];
+            }
         }
 
         public bool HasHosts()

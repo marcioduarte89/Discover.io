@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discoverio.Server.Tests.LoadBalancing.RoundRobin
@@ -79,30 +80,65 @@ namespace Discoverio.Server.Tests.LoadBalancing.RoundRobin
             Assert.AreEqual("https://www.someclient.com", host);
         }
 
-        //[Test]
-        //public async Task ResolveHost_RegisterSameAppWithDifferentHostInDistributor_ShouldReturnNextHost()
-        //{
-        //    var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, _configurationMock);
-        //    var discovery = new RoundRobinDistribution(inMemoryProvider, _discoveryLoggerMock.Object);
-        //    var uid = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
-        //    var uid2 = inMemoryProvider.Register("ClientApp", "https://www.someclient2.com");
+        [Test]
+        public void ResolveHost_ScallingSameAppInDistributor_ShouldReturnNextHost()
+        {
+            var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, _configurationMock);
+            var discovery = new RoundRobinDistribution(inMemoryProvider, _discoveryLoggerMock.Object);
+            var uid = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
+            var uid2 = inMemoryProvider.Register("ClientApp", "https://www.someclient2.com");
 
+            var host = discovery.ResolveHost(uid, "ClientApp");
+            var host2 = discovery.ResolveHost(uid2, "ClientApp");
+            Assert.AreEqual("https://www.someclient.com", host);
+            Assert.AreEqual("https://www.someclient2.com", host2);
+        }
 
-        //    var task1 = Task.Run(() =>
-        //    {
-        //        discovery.ResolveHost(uid, "ClientApp");
-        //    });
+        [Test]
+        public void ResolveHost_RegistrationExpiredInDistributor_ThrowsRpcException()
+        {
+            var inMemorySettings = new Dictionary<string, string> {
+                {"Discoverio.Server:DeRegisterCycleFrequency", "1"},
+                {"Discoverio.Server:ElapsedTimeToDeRegister", "1"},
+            };
 
-        //    var task2 = Task.Run(() =>
-        //    {
-        //        discovery.ResolveHost(uid, "ClientApp");
-        //    });
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
 
+            var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, configuration);
+            var discovery = new RoundRobinDistribution(inMemoryProvider, _discoveryLoggerMock.Object);
+            var uid = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
 
-        //    Task.WaitAll(task1, task2);
+            var host = discovery.ResolveHost(uid, "ClientApp");
+            Assert.AreEqual("https://www.someclient.com", host);
 
-        //    var host = discovery.ResolveHost(uid, "ClientApp");
-        //    Assert.AreEqual("https://www.someclient.com", host);
-        //}
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+
+            Assert.Throws<RpcException>(() => discovery.ResolveHost(uid, "SomeAppName"));
+        }
+
+        [Test]
+        public void ResolveHost_RegisterSameAppWithDifferentHostInDistributor_ShouldReturnNextHost()
+        {
+            var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, _configurationMock);
+            var discovery = new RoundRobinDistribution(inMemoryProvider, _discoveryLoggerMock.Object);
+            var uid = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
+            var uid2 = inMemoryProvider.Register("ClientApp", "https://www.someclient2.com");
+
+            var task1 = Task.Run(() =>
+            {
+                var host = discovery.ResolveHost(uid, "ClientApp");
+                Assert.AreEqual("https://www.someclient.com", host);
+            });
+
+            var task2 = Task.Run(() =>
+            {
+                var host = discovery.ResolveHost(uid2, "ClientApp");
+                Assert.AreEqual("https://www.someclient2.com", host);
+            });
+
+            Task.WaitAll(task1);
+        }
     }
 }

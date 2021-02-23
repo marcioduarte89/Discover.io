@@ -100,7 +100,7 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
             {
                 if (reg.Value.HasExpired(_configuration.GetValue<double>("Discoverio.Server:ElapsedTimeToDeRegister")))
                 {
-                    if(_registrations.TryRemove(reg.Key, out var registration))
+                    if (_registrations.TryRemove(reg.Key, out var registration))
                     {
                         _logger.LogInformation($"UnRegistering application with appName { registration.AppName } and host { registration.Host }");
                         RegistrationExpired?.Invoke(this, new RegistrationExpiredEventArgs() { Registration = registration });

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option csharp_namespace = "DiscoveryService.Services";
+import "UUID.proto";
+
+service ApplicationRegistrationService {
+	rpc Register(ApplicationSettings) returns (RegistrationStatus);
+}
+
+message ApplicationSettings {
+	string Host = 1;
+	string AppName = 2;
+}
+
+message RegistrationStatus {
+    bool success = 1; 
+	UUID UniqueIdentifier = 2;
+}

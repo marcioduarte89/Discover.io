@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option csharp_namespace = "DiscoveryService.Services";
+import "UUID.proto";
+
+service MonitorService {
+	rpc HeartBeat(UUID) returns (Status);
+}
+
+message Status {
+	bool success = 1;
+}

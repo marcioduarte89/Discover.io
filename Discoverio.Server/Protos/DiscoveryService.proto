@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "DiscoveryService.Services";
+import "UUID.proto";
+
+service DiscoveryService {
+	rpc Resolve(DiscoverySettings) returns (DiscoveryResponse);
+}
+
+message DiscoverySettings {
+	UUID UId = 1;
+	string AppName = 2;
+}
+
+message DiscoveryResponse {
+	string Host = 1;
+}

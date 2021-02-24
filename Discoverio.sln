@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discoverio.Client", "Discov
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discoverio.Server", "Discoverio.Server\Discoverio.Server.csproj", "{C9806D58-4836-4E3D-80B9-D0BCD3929ABF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discoverio.Client.Tests", "Discoverio.Client.Tests\Discoverio.Client.Tests.csproj", "{015401DE-878F-45A3-8389-3963FCEBBB56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{C9806D58-4836-4E3D-80B9-D0BCD3929ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9806D58-4836-4E3D-80B9-D0BCD3929ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9806D58-4836-4E3D-80B9-D0BCD3929ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{015401DE-878F-45A3-8389-3963FCEBBB56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{015401DE-878F-45A3-8389-3963FCEBBB56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{015401DE-878F-45A3-8389-3963FCEBBB56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{015401DE-878F-45A3-8389-3963FCEBBB56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +64,7 @@ Global
 		{828F68A1-5DD5-4BC9-8A06-4E99CAE1817F} = {5F87945D-AF0A-4B89-BB60-96F233801AF7}
 		{619AC922-801E-4704-93C9-C2B1F974B1DA} = {5F87945D-AF0A-4B89-BB60-96F233801AF7}
 		{D87ADCF8-53EA-4A52-ACDB-8032D4FF1E11} = {BF21B117-FEC5-4E62-BFBB-19C3D47A1D99}
+		{015401DE-878F-45A3-8389-3963FCEBBB56} = {BF21B117-FEC5-4E62-BFBB-19C3D47A1D99}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {67BD6E57-163A-41FE-8D71-1F6A383F851A}

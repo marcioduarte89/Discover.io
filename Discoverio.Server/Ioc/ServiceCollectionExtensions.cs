@@ -5,6 +5,7 @@ using Discoverio.Server.Services.RoundRobin;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace Discoverio.Server.Ioc
 {
@@ -23,6 +24,12 @@ namespace Discoverio.Server.Ioc
 
             serviceCollection.AddSingleton<IRegistrationProvider, InMemoryRegistrationProvider>(x => inMemoryRegistrationProvider);
             serviceCollection.AddSingleton<IServiceDiscoveryLoadBalancer, RoundRobinDistribution>(x => roundRobinDistribution);
+        }
+
+        // Use this extension method if one wants to override Registration providers or Distribution
+        public static void AddDiscoverio(this IServiceCollection serviceCollection, Func<IServiceCollection, IServiceCollection> extendedServices)
+        {
+            extendedServices(serviceCollection);
         }
     }
 }

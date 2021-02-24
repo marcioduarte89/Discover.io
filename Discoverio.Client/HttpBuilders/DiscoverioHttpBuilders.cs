@@ -2,14 +2,12 @@
 using Discoverio.Client.Middlewares;
 using Discoverio.Client.Policies;
 using Discoverio.Client.Services.Host;
-using Discoverio.Client.Services.Initializer;
 using Discoverio.Client.Services.Monitor;
 using Discoverio.Client.Services.Registration;
 using Grpc.Net.ClientFactory;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.Net.Http;
@@ -40,7 +38,6 @@ namespace Discoverio.Client.HttpBuilders
             services.AddGrpcClient<MonitorServiceClient>(grpcServerDeclaration).AddInterceptor<LoggerInterceptor>();
 
             services.AddHttpContextAccessor();
-            //services.AddSingleton<IInitializerService, DiscoverioInitializerService>();
             services.AddSingleton<IRegistrationService, RegistrationService>();
             services.AddSingleton<IMonitorService, MonitorService>();
             services.AddSingleton<IMemoryCache, MemoryCache>();

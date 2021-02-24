@@ -30,7 +30,7 @@ namespace Discoverio.Client.Delegates
         {
             var host = _discoveryServiceClient.Resolve(new DiscoverySettings()
             {
-                AppName = _hostService.ResolveAppName(request.RequestUri),
+                AppName = _hostService.GetAppName(request.RequestUri),
                 UId = _cache.Get<UUID>(KnownKeys.SERVICE_DISCOVERY_DISCOVERY_KEY)
             });
 

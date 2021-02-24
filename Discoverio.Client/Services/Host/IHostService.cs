@@ -6,6 +6,6 @@ namespace Discoverio.Client.Services.Host
     {
         Uri Build(Uri appHost, string resolvedHost);
 
-        string ResolveAppName(Uri appHost);
+        string GetAppName(Uri appHost);
     }
 }

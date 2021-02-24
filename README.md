@@ -1,4 +1,4 @@
-﻿﻿#Discover.io
+Discover.io
 =======
 
 ## Overview
@@ -24,17 +24,15 @@ After `ConfigureWebHostDefaults` configuration, like:
 
 ```c#
 public static IHostBuilder CreateHostBuilder(string[] args) =>
-	Host.CreateDefaultBuilder(args)
-		.ConfigureWebHostDefaults(webBuilder =>
-		{
-			webBuilder.UseStartup<Startup>();
-		})
-		.AddDiscoveryHostedService();
+   Host.CreateDefaultBuilder(args)
+	.ConfigureWebHostDefaults(webBuilder =>
+	{
+		webBuilder.UseStartup<Startup>();
+	})
+	.AddDiscoveryHostedService();
 ```
 
-In `Startup` class:
-
-In `ConfigureServices` method, add:
+In `Startup` class, in `ConfigureServices` method, add:
 
 `services.AddDiscoverio();`
 

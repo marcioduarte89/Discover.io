@@ -62,12 +62,21 @@ namespace Discoverio.Server.Tests.RegistrationProviders.InMemoryProvider
         }
 
         [Test]
-        public void RegisterHeartBeat_NoApplicationRegistered_ReturnsInvalidStatus()
+        public void RegisterHeartBeat_NullUUidRegistered_ThrowsArgumentException()
         {
             var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, _configurationMock);
             inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
 
-            Assert.IsFalse(inMemoryProvider.RegisterHeartBeat(new UUID()));
+            Assert.Throws<RpcException>(() => inMemoryProvider.RegisterHeartBeat(null));
+        }
+
+        [Test]
+        public void RegisterHeartBeat_EmptyUUidApplicationRegistered_ThrowsArgumentException()
+        {
+            var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, _configurationMock);
+            inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
+
+            Assert.Throws<RpcException>(() => inMemoryProvider.RegisterHeartBeat(new UUID()));
         }
 
         [Test]

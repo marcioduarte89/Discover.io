@@ -75,6 +75,10 @@ namespace Discoverio.Server.Services.RegistrationProviders.InMemoryProvider
 
         public bool RegisterHeartBeat(UUID uniqueId)
         {
+            if (uniqueId == null || string.IsNullOrWhiteSpace(uniqueId.Value)){
+                throw new RpcException(new Grpc.Core.Status(StatusCode.AlreadyExists, $"Únique id cannot be null or empty"));
+            }
+
             if (!_registrations.TryGetValue(new Guid(uniqueId.Value), out var registration))
             {
                 return false;

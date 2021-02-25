@@ -1,5 +1,7 @@
 mode: Mainline
-branches: {}
+branches:
+  master:
+    regex: main
 ignore:
   sha: []
 assembly-versioning-scheme: MajorMinor

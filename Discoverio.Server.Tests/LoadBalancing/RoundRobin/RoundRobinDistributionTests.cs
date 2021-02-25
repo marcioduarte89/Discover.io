@@ -117,28 +117,5 @@ namespace Discoverio.Server.Tests.LoadBalancing.RoundRobin
 
             Assert.Throws<RpcException>(() => discovery.ResolveHost(uid, "SomeAppName"));
         }
-
-        [Test]
-        public void ResolveHost_RegisterSameAppWithDifferentHostInDistributor_ShouldReturnNextHost()
-        {
-            var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, _configurationMock);
-            var discovery = new RoundRobinDistribution(inMemoryProvider, _discoveryLoggerMock.Object);
-            var uid = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
-            var uid2 = inMemoryProvider.Register("ClientApp", "https://www.someclient2.com");
-
-            var task1 = Task.Run(() =>
-            {
-                var host = discovery.ResolveHost(uid, "ClientApp");
-                Assert.AreEqual("https://www.someclient.com", host);
-            });
-
-            var task2 = Task.Run(() =>
-            {
-                var host = discovery.ResolveHost(uid2, "ClientApp");
-                Assert.AreEqual("https://www.someclient2.com", host);
-            });
-
-            Task.WaitAll(task1);
-        }
     }
 }

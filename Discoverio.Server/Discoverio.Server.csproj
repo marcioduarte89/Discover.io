@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageId>Discoverio.Server</PackageId>
+    <Authors>Marcio Duarte</Authors>
+    <Product>Discoverio</Product>
+    <Company>Marcio Duarte</Company>
+    <Description>A Service discovery in .NET for .NET</Description>
+    <PackageProjectUrl>https://github.com/marcioduarte89/Discover.io</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/marcioduarte89/Discover.io</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright Marcio Duarte</Copyright>
+    <Title>Discoverio Server</Title>
   </PropertyGroup>
 
   <ItemGroup>

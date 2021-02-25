@@ -22,7 +22,7 @@ steps:
     versionSpec: '5.0.0'
 
 - script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+  displayName: 'Dotnet Build $(buildConfiguration)'
   
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests

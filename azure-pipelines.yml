@@ -32,7 +32,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
-    packagesToPack: '**/Discoverio.Client.csproj;**/Discoverio.Server.csproj'
+    packagesToPack: '**/Discoverio.Client.csproj'
     nobuild: true
     packDirectory: '$(Build.ArtifactStagingDirectory)'
     includesymbols: true

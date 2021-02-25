@@ -36,5 +36,5 @@ steps:
     nobuild: true
     packDirectory: '$(Build.ArtifactStagingDirectory)'
     includesymbols: true
-    versioningScheme: byEnvVar
+    versioningScheme: off
     versionEnvVar: 'GitVersion.NuGetVersion'

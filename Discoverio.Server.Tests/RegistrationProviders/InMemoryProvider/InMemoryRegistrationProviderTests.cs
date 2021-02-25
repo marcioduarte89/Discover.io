@@ -97,25 +97,25 @@ namespace Discoverio.Server.Tests.RegistrationProviders.InMemoryProvider
             Assert.IsTrue(inMemoryProvider.HasRegistration(uniqueId));
         }
 
-        [Test]
-        public void DeRegisterApplication_ApplicationIsRegisteredThenDeRegistered_ReturnsFalse()
-        {
-            var inMemorySettings = new Dictionary<string, string> {
-                {"Discoverio.Server:DeRegisterCycleFrequency", "1"},
-                {"Discoverio.Server:ElapsedTimeToDeRegister", "1"},
-            };
+        //[Test]
+        //public void DeRegisterApplication_ApplicationIsRegisteredThenDeRegistered_ReturnsFalse()
+        //{
+        //    var inMemorySettings = new Dictionary<string, string> {
+        //        {"Discoverio.Server:DeRegisterCycleFrequency", "1"},
+        //        {"Discoverio.Server:ElapsedTimeToDeRegister", "1"},
+        //    };
 
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(inMemorySettings)
-                .Build();
+        //    var configuration = new ConfigurationBuilder()
+        //        .AddInMemoryCollection(inMemorySettings)
+        //        .Build();
 
-            var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, configuration);
-            var uniqueId = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
-            Assert.IsTrue(inMemoryProvider.HasRegistration(uniqueId));
+        //    var inMemoryProvider = new InMemoryRegistrationProvider(_inMemoryLoggerMock.Object, configuration);
+        //    var uniqueId = inMemoryProvider.Register("ClientApp", "https://www.someclient.com");
+        //    Assert.IsTrue(inMemoryProvider.HasRegistration(uniqueId));
 
-            Thread.Sleep(TimeSpan.FromSeconds(2));
+        //    Thread.Sleep(TimeSpan.FromSeconds(2));
 
-            Assert.IsFalse(inMemoryProvider.HasRegistration(uniqueId));
-        }
+        //    Assert.IsFalse(inMemoryProvider.HasRegistration(uniqueId));
+        //}
     }
 }

@@ -30,9 +30,21 @@ steps:
     projects: '**/*Tests/*.csproj'  
   
 - task: DotNetCoreCLI@2
+  displayName: "dotnet pack client"
   inputs:
     command: 'pack'
     packagesToPack: '**/Discoverio.Client.csproj'
+    nobuild: true
+    packDirectory: '$(Build.ArtifactStagingDirectory)'
+    includesymbols: true
+    versioningScheme: off
+    versionEnvVar: 'GitVersion.NuGetVersion'
+    
+- task: DotNetCoreCLI@2
+  displayName: "dotnet pack server"
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/Discoverio.Server.csproj'
     nobuild: true
     packDirectory: '$(Build.ArtifactStagingDirectory)'
     includesymbols: true

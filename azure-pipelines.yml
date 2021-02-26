@@ -53,11 +53,16 @@ steps:
     versioningScheme: off
     versionEnvVar: 'GitVersion.NuGetVersion'
 
-- task: git-tag-on-release-task@9
-  displayName: "Add Tag"
+- task: GitHubRelease@1
   inputs:
-    staticTagName: 'GitVersion.NuGetVersion'
-
+    gitHubConnection: 'github.com_marcioduarte89'
+    repositoryName: 'marcioduarte89/Discover.io'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    tag: 'GitVersion.NuGetVersion'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
 
 # - task: NuGetCommand@2
 #   displayName: "Nuget push to Nuget.org"

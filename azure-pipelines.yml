@@ -48,7 +48,7 @@ stages:
           arguments: '--configuration $(buildConfiguration) --no-build'
           projects: '**/*Tests/*.csproj'  
 
-- stage: Package_&_Release
+- stage: Package_And_Release
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   pool:
     vmImage: ubuntu-latest
